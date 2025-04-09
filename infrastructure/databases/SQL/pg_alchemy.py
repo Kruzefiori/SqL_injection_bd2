@@ -1,6 +1,6 @@
 from sqlalchemy import MetaData, create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from config.settings import env
+from config.env import env
 
 
 class SqlDB:
@@ -38,4 +38,3 @@ class SqlDB:
 
     def get_db(self):
         return self._instance
-
