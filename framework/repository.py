@@ -1,4 +1,3 @@
-import logging
 from infrastructure.databases.SQL.pg_alchemy  import SqlDB
 
 
@@ -10,7 +9,7 @@ class GenericRepository:
         self.model_class = model_class
 
     def create(self, item):
-       session = self._create_a_session()
+        session = self._create_a_session()
         try:
             session.add(item)
             session.commit()
@@ -23,7 +22,7 @@ class GenericRepository:
         return item
 
     def delete(self, item):
-       session = self._create_a_session()
+        session = self._create_a_session()
         try:
             session.delete(item)
             session.commit()
@@ -35,7 +34,7 @@ class GenericRepository:
         return item
 
     def get_by_id(self, id: int):
-       session = self._create_a_session()
+        session = self._create_a_session()
         try:
             item = session.query(self.model_class)\
                     .filter(self.model_class.id == id)\
@@ -48,7 +47,7 @@ class GenericRepository:
         return item
 
     def get_all(self, page: int):
-       session = self._create_a_session()
+        session = self._create_a_session()
         offset = (page - 1) * 100
         limit = page * 100
         try:
@@ -64,7 +63,7 @@ class GenericRepository:
         return items
 
     def update(self, item):
-       session = self._create_a_session()
+        session = self._create_a_session()
         try:
             session.merge(item)
             session.commit()
