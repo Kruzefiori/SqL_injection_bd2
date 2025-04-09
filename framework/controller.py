@@ -15,29 +15,29 @@ class GenericRouter:
         self.initialize()
 
     def create(self):
-        async def create_item(item: self.model_schema) -> JSONResponse:
-            """
-            Create a new item.
+            async def create_item(item) -> JSONResponse:
+                """
+                Create a new item.
 
-            Args:
-                item (self.model_schema): The item to create.
+                Args:
+                    item (self.model_schema): The item to create.
 
-            Returns:
-                Response: JSON response with the created item information.
-            """
-            item = self.model_service.create(item)
+                Returns:
+                    Response: JSON response with the created item information.
+                """
+                item = self.model_service.create(item)
 
-            response_data_json = item.model_dump_json()
+                response_data_json = item.model_dump_json()
 
-            response_data_json = json.loads(response_data_json)
+                response_data_json = json.loads(response_data_json)
 
-            return JSONResponse(
-                content=response_data_json,
-                media_type="application/json",
-                status_code=status.HTTP_201_CREATED
-            )
+                return JSONResponse(
+                    content=response_data_json,
+                    media_type="application/json",
+                    status_code=status.HTTP_201_CREATED
+                )
 
-        return create_item
+            return create_item
 
     def get_by_id(self):
         async def get_item(id: int) -> JSONResponse:
@@ -102,29 +102,29 @@ class GenericRouter:
         return get_items
 
     def update(self):
-        async def update_item(item: self.model_schema) -> JSONResponse:
-            """
-            Update an item.
+            async def update_item(item) -> JSONResponse:
+                """
+                Update an item.
 
-            Args:
-                item (self.model_schema): The item to update.
+                Args:
+                    item (self.model_schema): The item to update.
 
-            Returns:
-                Response: JSON response with the updated item information.
-            """
-            item = self.model_service.update(item)
+                Returns:
+                    Response: JSON response with the updated item information.
+                """
+                item = self.model_service.update(item)
 
-            response_data_json = item.model_dump_json()
+                response_data_json = item.model_dump_json()
 
-            response_data_json = json.loads(response_data_json)
+                response_data_json = json.loads(response_data_json)
 
-            return JSONResponse(
-                content=response_data_json,
-                media_type="application/json",
-                status_code=status.HTTP_200_OK
-            )
+                return JSONResponse(
+                    content=response_data_json,
+                    media_type="application/json",
+                    status_code=status.HTTP_200_OK
+                )
 
-        return update_item
+            return update_item
 
     def delete(self):
         async def delete_item(id: int) -> JSONResponse:
