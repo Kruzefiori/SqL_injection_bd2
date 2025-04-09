@@ -1,9 +1,9 @@
+from model import OrderSchema
+from framework.service import GenericService
+from repository import OrderRepository
 
-from app.models.user import UserSchema
-from app.services.dependencies import GenericService
 
-
-class UserService(GenericService):
+# Bla bla bla, voces entenderam
+class OrderService(GenericService):
     def __init__(self):
-        super().__init__(UserRepository, UserSchema)
-
+        super().__init__(OrderRepository, OrderSchema)
