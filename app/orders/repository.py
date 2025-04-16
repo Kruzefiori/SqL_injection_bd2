@@ -59,32 +59,36 @@ class OrdersRepositoryInjection(GenericRepositoryInjection):
         session = self._create_a_session()
         
         try:
-            # The query from the ORM should be converted to SQL
-            offset = (page - 1) * page_size
 
             query = """
-                SELECT e.firstname, e.lastname, COUNT(o.orderid) AS total_pedidos,
-                       SUM(od.unitprice * od.quantity) AS soma_valores_vendidos
-                FROM employees e
-                JOIN orders o ON o.employeeid = e.employeeid
-                JOIN orderdetails od ON od.orderid = o.orderid
-                WHERE o.orderdate BETWEEN :start_date AND :end_date
-                GROUP BY e.employeeid
-                ORDER BY soma_valores_vendidos DESC
-                OFFSET :offset LIMIT :page_size;
+                SELECT o.orderid, o.orderdate, c.companyname AS customer_name,
+                       e.firstname || ' ' || e.lastname AS employee_name,
+                       od.productid, od.quantity, od.unitprice
+                FROM orders o
+                LEFT JOIN customers c ON o.customerid = c.customerid
+                LEFT JOIN employees e ON o.employeeid = e.employeeid
+                LEFT JOIN orderdetails od ON o.orderid = od.orderid
+                WHERE o.orderid = :order_id
             """
-            params = {
-                'start_date': start_date,
-                'end_date': end_date,
-                'offset': offset,
-                'page_size': page_size
+            result = session.execute(query, {'order_id': order_id}).fetchall()
+            if not result:
+                raise ValueError(f"Pedido com ID {order_id} não encontrado")
+            order_report = {
+                "Número do Pedido": result[0][0],
+                "Data do Pedido": result[0][1],
+                "Nome do Cliente": result[0][2],
+                "Nome do Vendedor": result[0][3],
+                "Itens do Pedido": []
             }
-
-            session.execute(query, params)
-            results = session.fetchall()
-            return results   
-        
+            for row in result:
+                product_info = {
+                    "Produto": row[4],
+                    "Quantidade": row[5],
+                    "Preço": row[6]
+                }
+                order_report["Itens do Pedido"].append(product_info)
+            return order_report
         except Exception as e:
-            raise RuntimeError(f"Erro ao buscar informações do funcionários: {e}") from e
+            raise RuntimeError(f"Erro ao buscar informações do pedido {order_id}: {e}") from e
         finally:
             session.close()
