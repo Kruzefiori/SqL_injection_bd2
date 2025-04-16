@@ -1,16 +1,18 @@
+from datetime import datetime
 from fastapi import APIRouter, Request
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
-from .service import EmployeesService
-from datetime import datetime
+from ..services.no_injection import EmployeesService
 
 employees_view = APIRouter()
 templates = Jinja2Templates(directory="app/employees/templates/")
 employees_service = EmployeesService()
 
+
 def format_date(input_date):
     dt = datetime.fromisoformat(input_date)
     return dt.strftime("%Y-%m-%d %H:%M:%S.%f") + "+00:00"
+
 
 @employees_view.get("/employees/select", response_class=HTMLResponse)
 async def select_product(request: Request):
@@ -24,10 +26,10 @@ async def show_salary_report(
     end_date: str,
     page: int = 1,
 ):
-    formatted_start = format_date(start_date)
-    formatted_end = format_date(end_date)
+    start_datetime = datetime.fromisoformat(start_date)
+    end_datetime = datetime.fromisoformat(end_date)
 
-    report = employees_service.get_employee_report(formatted_start, formatted_end, page)
+    report = employees_service.get_employee_report(start_datetime, end_datetime, page)
     employees = report["data"]
 
     metadata = report["metadata"]
@@ -42,6 +44,6 @@ async def show_salary_report(
             "start_date": start_date,
             "end_date": end_date,
             "current_page": page,
-            "total_pages": total_pages
-        }
+            "total_pages": total_pages,
+        },
     )
