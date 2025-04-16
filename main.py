@@ -1,7 +1,10 @@
 from fastapi.middleware.cors import CORSMiddleware
 from config.env import env
 from fastapi import FastAPI
+from app.employees.controller import employees_controller
+from app.employees.view import employees_view
 from app.orders.controller import order_controller
+from app.orders.view import order_view
 
 app = FastAPI()
 
@@ -19,4 +22,7 @@ app.add_middleware(
     ],
 )
 
-app.include_router(order_controller.router, prefix="/v1/no_injection", tags=["analyze"])
+app.include_router(employees_controller, prefix="/v1/no_injection", tags=["Employees"])
+app.include_router(employees_view, tags=["Employees"])
+app.include_router(order_controller, prefix="/v1/no_injection", tags=["Orders"])
+app.include_router(order_view, tags=["Orders"])
