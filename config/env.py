@@ -10,7 +10,7 @@ class Env():
     app_cors_headers: str = getenv("APP_CORS_HEADERS", "Content-Type")
     sql_db_uri: str = getenv(
         "SQL_DB_URI",
-        "postgresql://postgres:postgres@localhost:5432/postgres")
+        "postgresql://unifei:unifei@localhost:8081/unifei")
     sql_db_provider: str = getenv("SQL_DB_PROVIDER", "postgresql")
 
 

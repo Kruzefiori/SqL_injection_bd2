@@ -29,7 +29,7 @@ class GenericService:
     def get_all(self, page: int):
         if page < 1:
             raise ValueError("Page must be greater than 0")
-        items = self.model_repository.get_all(page)
+        items = self.model_repository.get_all(1)
         if items is None:
             raise ValueError("Items not found")
         items = [

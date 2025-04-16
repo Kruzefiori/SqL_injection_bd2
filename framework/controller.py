@@ -87,7 +87,7 @@ class GenericRouter:
                     detail="Page number must be greater than 0"
                 )
 
-            items = self.model_service.get_all(page)
+            items = self.model_service.get_all(1)
 
             items = [
                 json.loads(item.model_dump_json())
@@ -159,7 +159,7 @@ class GenericRouter:
             path=f"/{self.class_name}",
             endpoint=self.create(),
             methods=["POST"],
-            response_model=self.model_schema,
+            # response_model=self.model_schema,
             response_description=f"Created a new {self.class_name}",
         )
 
@@ -167,7 +167,7 @@ class GenericRouter:
             path=f"/{self.class_name}/{{id}}",
             endpoint=self.get_by_id(),
             methods=["GET"],
-            response_model=self.model_schema,
+            # response_model=self.model_schema,
             response_description=f"Getted a {self.class_name} by ID",
         )
 
@@ -175,7 +175,7 @@ class GenericRouter:
             path=f"/{self.class_name}",
             endpoint=self.get_all(),
             methods=["GET"],
-            response_model=List[self.model_schema],
+            # response_model=List[self.model_schema],
             response_description=f"Getted all {self.class_name}",
         )
 
@@ -183,7 +183,7 @@ class GenericRouter:
             path=f"/{self.class_name}",
             endpoint=self.update(),
             methods=["PUT"],
-            response_model=self.model_schema,
+            # response_model=self.model_schema,
             response_description=f"Updated a {self.class_name}",
         )
 
@@ -191,6 +191,6 @@ class GenericRouter:
             path=f"/{self.class_name}/{{id}}",
             endpoint=self.delete(),
             methods=["DELETE"],
-            response_model=self.model_schema,
+            # response_model=self.model_schema,
             response_description=f"Deleted a {self.class_name} by ID",
         )
