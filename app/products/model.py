@@ -1,6 +1,13 @@
 from framework.model import ModelGeneric
-from typing import List, Optional,TYPE_CHECKING
-from sqlalchemy import  Integer, ForeignKeyConstraint, Numeric, PrimaryKeyConstraint, SmallInteger, String
+from typing import List, Optional, TYPE_CHECKING
+from sqlalchemy import (
+    Integer,
+    ForeignKeyConstraint,
+    Numeric,
+    PrimaryKeyConstraint,
+    SmallInteger,
+    String,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import decimal
 from app.categories.model import Categories
@@ -13,13 +20,18 @@ if TYPE_CHECKING:
 else:
     Orders = "Orders"
 
+
 class Products(ModelGeneric):
-    __tablename__ = 'products'
+    __tablename__ = "products"
     __table_args__ = (
-        ForeignKeyConstraint(['categoryid'], ['northwind.categories.categoryid'], name='fk_category'),
-        ForeignKeyConstraint(['supplierid'], ['northwind.suppliers.supplierid'], name='fk_supplier'),
-        PrimaryKeyConstraint('productid', name='products_pkey'),
-        {'schema': 'northwind'}
+        ForeignKeyConstraint(
+            ["categoryid"], ["northwind.categories.categoryid"], name="fk_category"
+        ),
+        ForeignKeyConstraint(
+            ["supplierid"], ["northwind.suppliers.supplierid"], name="fk_supplier"
+        ),
+        PrimaryKeyConstraint("productid", name="products_pkey"),
+        {"schema": "northwind"},
     )
 
     productid: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -33,6 +45,12 @@ class Products(ModelGeneric):
     reorderlevel: Mapped[Optional[int]] = mapped_column(SmallInteger)
     discontinued: Mapped[Optional[str]] = mapped_column(String(1))
 
-    categories: Mapped['Categories'] = relationship('Categories', back_populates='products')
-    suppliers: Mapped['Suppliers'] = relationship('Suppliers', back_populates='products')
-    order_details: Mapped[List['OrderDetails']] = relationship('OrderDetails', back_populates='products')
+    categories: Mapped["Categories"] = relationship(
+        "Categories", back_populates="products"
+    )
+    suppliers: Mapped["Suppliers"] = relationship(
+        "Suppliers", back_populates="products"
+    )
+    order_details: Mapped[List["OrderDetails"]] = relationship(
+        "OrderDetails", back_populates="products"
+    )

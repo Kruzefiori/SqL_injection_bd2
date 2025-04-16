@@ -10,10 +10,10 @@ else:
 
 
 class Customers(ModelGeneric):
-    __tablename__ = 'customers'
+    __tablename__ = "customers"
     __table_args__ = (
-        PrimaryKeyConstraint('customerid', name='customers_pkey'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("customerid", name="customers_pkey"),
+        {"schema": "northwind"},
     )
 
     customerid: Mapped[str] = mapped_column(String(5), primary_key=True)
@@ -28,4 +28,4 @@ class Customers(ModelGeneric):
     phone: Mapped[Optional[str]] = mapped_column(String(17))
     fax: Mapped[Optional[str]] = mapped_column(String(17))
 
-    orders: Mapped[List['Orders']] = relationship('Orders', back_populates='customers')
+    orders: Mapped[List["Orders"]] = relationship("Orders", back_populates="customers")

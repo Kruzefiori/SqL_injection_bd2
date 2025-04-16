@@ -1,6 +1,13 @@
 from framework.model import ModelGeneric
 from typing import List, Optional
-from sqlalchemy import DateTime, ForeignKeyConstraint, Integer, Numeric, PrimaryKeyConstraint, String
+from sqlalchemy import (
+    DateTime,
+    ForeignKeyConstraint,
+    Integer,
+    Numeric,
+    PrimaryKeyConstraint,
+    String,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from decimal import Decimal
 from datetime import datetime
@@ -11,13 +18,19 @@ from .order_details import OrderDetails
 
 
 class Orders(ModelGeneric):
-    __tablename__ = 'orders'
+    __tablename__ = "orders"
     __table_args__ = (
-        ForeignKeyConstraint(['customerid'], ['northwind.customers.customerid'], name='fk_customer'),
-        ForeignKeyConstraint(['employeeid'], ['northwind.employees.employeeid'], name='fk_employee'),
-        ForeignKeyConstraint(['shipperid'], ['northwind.shippers.shipperid'], name='fk_shipper'),
-        PrimaryKeyConstraint('orderid', name='orders_pkey'),
-        {'schema': 'northwind'}
+        ForeignKeyConstraint(
+            ["customerid"], ["northwind.customers.customerid"], name="fk_customer"
+        ),
+        ForeignKeyConstraint(
+            ["employeeid"], ["northwind.employees.employeeid"], name="fk_employee"
+        ),
+        ForeignKeyConstraint(
+            ["shipperid"], ["northwind.shippers.shipperid"], name="fk_shipper"
+        ),
+        PrimaryKeyConstraint("orderid", name="orders_pkey"),
+        {"schema": "northwind"},
     )
 
     orderid: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -35,7 +48,11 @@ class Orders(ModelGeneric):
     shipcountry: Mapped[Optional[str]] = mapped_column(String(15))
     shipperid: Mapped[Optional[int]] = mapped_column(Integer)
 
-    customers: Mapped['Customers'] = relationship('Customers', back_populates='orders')
-    employees: Mapped['Employees'] = relationship('Employees', back_populates='orders')
-    shippers: Mapped[Optional['Shippers']] = relationship('Shippers', back_populates='orders')
-    order_details: Mapped[List['OrderDetails']] = relationship('OrderDetails', back_populates='orders')
+    customers: Mapped["Customers"] = relationship("Customers", back_populates="orders")
+    employees: Mapped["Employees"] = relationship("Employees", back_populates="orders")
+    shippers: Mapped[Optional["Shippers"]] = relationship(
+        "Shippers", back_populates="orders"
+    )
+    order_details: Mapped[List["OrderDetails"]] = relationship(
+        "OrderDetails", back_populates="orders"
+    )

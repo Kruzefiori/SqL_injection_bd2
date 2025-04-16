@@ -10,10 +10,10 @@ else:
 
 
 class Suppliers(ModelGeneric):
-    __tablename__ = 'suppliers'
+    __tablename__ = "suppliers"
     __table_args__ = (
-        PrimaryKeyConstraint('supplierid', name='supplier_pk'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("supplierid", name="supplier_pk"),
+        {"schema": "northwind"},
     )
 
     supplierid: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -29,4 +29,6 @@ class Suppliers(ModelGeneric):
     fax: Mapped[Optional[str]] = mapped_column(String(15))
     homepage: Mapped[Optional[str]] = mapped_column(String(100))
 
-    products: Mapped[List['Products']] = relationship('Products', back_populates='suppliers')
+    products: Mapped[List["Products"]] = relationship(
+        "Products", back_populates="suppliers"
+    )

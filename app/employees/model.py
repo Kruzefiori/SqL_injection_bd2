@@ -1,20 +1,32 @@
-from framework.model import ModelGeneric
-from typing import List, Optional, TYPE_CHECKING
-from sqlalchemy import DateTime, Integer, ForeignKeyConstraint, PrimaryKeyConstraint, String, Text
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 import datetime
+from framework.model import ModelGeneric
+from sqlalchemy import (
+    DateTime,
+    Integer,
+    ForeignKeyConstraint,
+    PrimaryKeyConstraint,
+    String,
+    Text,
+)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from typing import List, Optional, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.orders.models.order import Orders
 else:
     Orders = "Orders"
 
+
 class Employees(ModelGeneric):
-    __tablename__ = 'employees'
+    __tablename__ = "employees"
     __table_args__ = (
-        ForeignKeyConstraint(['reportsto'], ['northwind.employees.employeeid'], name='fk_employees_reportsto'),
-        PrimaryKeyConstraint('employeeid', name='employees_pkey'),
-        {'schema': 'northwind'}
+        ForeignKeyConstraint(
+            ["reportsto"],
+            ["northwind.employees.employeeid"],
+            name="fk_employees_reportsto",
+        ),
+        PrimaryKeyConstraint("employeeid", name="employees_pkey"),
+        {"schema": "northwind"},
     )
 
     employeeid: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -34,6 +46,10 @@ class Employees(ModelGeneric):
     reportsto: Mapped[Optional[int]] = mapped_column(Integer)
     notes: Mapped[Optional[str]] = mapped_column(Text)
 
-    reports_to: Mapped[Optional['Employees']] = relationship('Employees', remote_side=[employeeid], back_populates='subordinates')
-    subordinates: Mapped[List['Employees']] = relationship('Employees', back_populates='reports_to')
-    orders: Mapped[List['Orders']] = relationship('Orders', back_populates='employees')
+    reports_to: Mapped[Optional["Employees"]] = relationship(
+        "Employees", remote_side=[employeeid], back_populates="subordinates"
+    )
+    subordinates: Mapped[List["Employees"]] = relationship(
+        "Employees", back_populates="reports_to"
+    )
+    orders: Mapped[List["Orders"]] = relationship("Orders", back_populates="employees")

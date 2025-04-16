@@ -12,7 +12,7 @@ class GenericService:
         return item
 
     def delete(self, id: int):
-        item = self.model_repository.get_by_field('id', id)
+        item = self.model_repository.get_by_field("id", id)
 
         item = self.model_repository.delete(item)
         if item is None:
@@ -20,7 +20,9 @@ class GenericService:
         return item
 
     def get_by_id(self, id: int):
-        item = self.model_repository.get_by_field(Field(name=self.model_repository.id_name(), value=id))
+        item = self.model_repository.get_by_field(
+            Field(name=self.model_repository.id_name(), value=id)
+        )
         if item is None:
             raise ValueError("Item not found")
         return item
@@ -40,7 +42,7 @@ class GenericService:
         return items
 
     def update(self, item):
-        item = self.model_repository.get_by_field('id', id)
+        item = self.model_repository.get_by_field("id", id)
         if item is None:
             raise ValueError("Item not found")
         item = self.model_repository.update(item)

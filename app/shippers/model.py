@@ -10,14 +10,14 @@ else:
 
 
 class Shippers(ModelGeneric):
-    __tablename__ = 'shippers'
+    __tablename__ = "shippers"
     __table_args__ = (
-        PrimaryKeyConstraint('shipperid', name='shippers_pkey'),
-        {'schema': 'northwind'}
+        PrimaryKeyConstraint("shipperid", name="shippers_pkey"),
+        {"schema": "northwind"},
     )
 
     shipperid: Mapped[int] = mapped_column(Integer, primary_key=True)
     companyname: Mapped[Optional[str]] = mapped_column(String(20))
     phone: Mapped[Optional[str]] = mapped_column(String(14))
 
-    orders: Mapped[List['Orders']] = relationship('Orders', back_populates='shippers')
+    orders: Mapped[List["Orders"]] = relationship("Orders", back_populates="shippers")

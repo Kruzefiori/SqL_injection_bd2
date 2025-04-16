@@ -5,6 +5,7 @@ from config.env import env
 
 class SqlDB:
     _instance = None
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(SqlDB, cls).__new__(cls)
@@ -22,10 +23,7 @@ class SqlDB:
 
     def get_session(self):
         session = sessionmaker(
-            autocommit=False,
-            autoflush=False,
-            bind=self.engine,
-            expire_on_commit=True
+            autocommit=False, autoflush=False, bind=self.engine, expire_on_commit=True
         )()
 
         return session
