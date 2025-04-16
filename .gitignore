@@ -1,0 +1,7 @@
+.venv
+.ropeproject
+__pycache__
+.vscode
+env
+.env
+.pytest_cache

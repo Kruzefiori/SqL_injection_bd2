@@ -1,14 +1,18 @@
-from typing import Optional
-from sqlalchemy import DateTime, Integer, Numeric, PrimaryKeyConstraint, SmallInteger, String, Text
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from infrastructure.databases.SQL.pg_alchemy import SqlDB
+from framework.model import ModelGeneric
+from typing import List, Optional, TYPE_CHECKING
+from sqlalchemy import DateTime, Integer, ForeignKeyConstraint, PrimaryKeyConstraint, String, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 import datetime
 
-Base = SqlDB().get_base()
+if TYPE_CHECKING:
+    from app.orders.models.order import Orders
+else:
+    Orders = "Orders"
 
-class Employee(Base):
+class Employees(ModelGeneric):
     __tablename__ = 'employees'
     __table_args__ = (
+        ForeignKeyConstraint(['reportsto'], ['northwind.employees.employeeid'], name='fk_employees_reportsto'),
         PrimaryKeyConstraint('employeeid', name='employees_pkey'),
         {'schema': 'northwind'}
     )
@@ -29,3 +33,7 @@ class Employee(Base):
     extension: Mapped[Optional[str]] = mapped_column(String(4))
     reportsto: Mapped[Optional[int]] = mapped_column(Integer)
     notes: Mapped[Optional[str]] = mapped_column(Text)
+
+    reports_to: Mapped[Optional['Employees']] = relationship('Employees', remote_side=[employeeid], back_populates='subordinates')
+    subordinates: Mapped[List['Employees']] = relationship('Employees', back_populates='reports_to')
+    orders: Mapped[List['Orders']] = relationship('Orders', back_populates='employees')
