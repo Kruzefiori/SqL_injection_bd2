@@ -19,3 +19,4 @@ class Categories(ModelGeneric):
     description: Mapped[Optional[str]] = mapped_column(String(100))
 
     products: Mapped[List['Products']] = relationship('Products', back_populates='categories')
+
