@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres
+    container_name: unifei
+    ports:
+      - 8081:5432
+    environment:
+      POSTGRES_DB: unifei
+      POSTGRES_USER: unifei
+      POSTGRES_PASSWORD: unifei
+    restart: always
+    volumes:
+      - postgres:/var/lib/postgres/data
+volumes:
+  postgres:
