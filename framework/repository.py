@@ -216,7 +216,7 @@ class GenericRepositoryInjection:
     def _create_a_session(self):
         if self.db is None:
             raise ValueError("Database not initialized")
-        session = self.db.get_session()
+        session = self.db.get_cursor()
         if session is None:
             raise ValueError("An error occurred while connecting to the database")
         return session

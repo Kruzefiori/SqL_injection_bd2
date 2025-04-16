@@ -1,6 +1,6 @@
 from .models.order import Orders
 from .models.order_details import OrderDetails
-from framework.repository import GenericRepository
+from framework.repository import GenericRepository, GenericRepositoryInjection
 from sqlalchemy.orm import joinedload
 
 
@@ -46,5 +46,45 @@ class OrderRepository(GenericRepository):
         except Exception as e:
             session.rollback()
             raise RuntimeError(f"Erro ao buscar informações do pedido {order_id}: {e}") from e
+        finally:
+            session.close()
+
+
+class OrdersRepositoryInjection(GenericRepositoryInjection):
+    def __init__(self):
+        super().__init__(Orders)
+    
+    def get_order_report(self, order_id: int):
+        
+        session = self._create_a_session()
+        
+        try:
+            # The query from the ORM should be converted to SQL
+            offset = (page - 1) * page_size
+
+            query = """
+                SELECT e.firstname, e.lastname, COUNT(o.orderid) AS total_pedidos,
+                       SUM(od.unitprice * od.quantity) AS soma_valores_vendidos
+                FROM employees e
+                JOIN orders o ON o.employeeid = e.employeeid
+                JOIN orderdetails od ON od.orderid = o.orderid
+                WHERE o.orderdate BETWEEN :start_date AND :end_date
+                GROUP BY e.employeeid
+                ORDER BY soma_valores_vendidos DESC
+                OFFSET :offset LIMIT :page_size;
+            """
+            params = {
+                'start_date': start_date,
+                'end_date': end_date,
+                'offset': offset,
+                'page_size': page_size
+            }
+
+            session.execute(query, params)
+            results = session.fetchall()
+            return results   
+        
+        except Exception as e:
+            raise RuntimeError(f"Erro ao buscar informações do funcionários: {e}") from e
         finally:
             session.close()
