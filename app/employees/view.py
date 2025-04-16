@@ -32,7 +32,7 @@ async def show_salary_report(
 
     metadata = report["metadata"]
 
-    total_pages = metadata["page"] // 10 + 1
+    total_pages = (metadata["count"] + 9) // 10
 
     return templates.TemplateResponse(
         "report.html",
