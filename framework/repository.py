@@ -1,4 +1,16 @@
-from infrastructure.databases.SQL.pg_alchemy  import SqlDB
+from infrastructure.databases.SQL.pg_alchemy import SqlDB
+from dataclasses import dataclass
+from typing import Generic, TypeVar, Union
+from sqlalchemy import inspect
+from sqlalchemy.orm import Session
+
+T = TypeVar("T")
+
+
+@dataclass
+class Field(Generic[T]):
+    name: str
+    value: T
 
 
 class GenericRepository:
@@ -14,71 +26,100 @@ class GenericRepository:
             session.add(item)
             session.commit()
             session.refresh(item)
-        except Exception:
+            return item
+        except Exception as e:
             session.rollback()
-            raise
+            raise RuntimeError(f"Error creating {self.model_class.__name__}: {e}") from e
         finally:
             session.close()
-        return item
 
     def delete(self, item):
         session = self._create_a_session()
         try:
             session.delete(item)
             session.commit()
-        except Exception:
+            return item
+        except Exception as e:
             session.rollback()
-            raise
+            raise RuntimeError(f"Error deleting {self.model_class.__name__}: {e}") from e
         finally:
             session.close()
-        return item
 
-    def get_by_id(self, id: int):
-        session = self._create_a_session()
-        try:
-            item = session.query(self.model_class)\
-                    .filter(self.model_class.id == id)\
-                    .first()
-        except Exception:
-            session.rollback()
-            raise
-        finally:
-            session.close()
-        return item
+    def delete_by_id(self, id_: Union[int, str, tuple, dict]):
+        item = self.get_by_id(id_)
+        if not item:
+            raise ValueError(f"{self.model_class.__name__} with ID {id_} not found")
+        return self.delete(item)
 
-    def get_all(self, page: int):
+    def _id_name(self) -> list[str]:
+        return [key.name for key in inspect(self.model_class).primary_key]
+
+    def get_all(self, page: int = 1, page_size: int = 10):
         session = self._create_a_session()
-        offset = (page - 1) * 100
-        limit = page * 100
+        offset = (page - 1) * page_size
         try:
-            items = session.query(self.model_class)\
-                .offset(offset)\
-                .limit(limit)\
+            return (
+                session.query(self.model_class)
+                .offset(offset)
+                .limit(page_size)
                 .all()
-        except Exception:
+            )
+        except Exception as e:
             session.rollback()
-            raise
+            raise RuntimeError(f"Error fetching all {self.model_class.__name__}: {e}") from e
         finally:
             session.close()
-        return items
+
+    def get_by_field(self, field: Field):
+        return self.get_by_fields([field])
+
+    def get_by_fields(self, fields: list[Field]):
+        session = self._create_a_session()
+        try:
+            query = session.query(self.model_class)
+            for field in fields:
+                column = getattr(self.model_class, field.name, None)
+                if column is None:
+                    raise AttributeError(f"Model {self.model_class.__name__} has no field named '{field.name}'")
+                query = query.filter(column == field.value)
+            return query.first()
+        except Exception as e:
+            session.rollback()
+            field_details = ", ".join(f"{f.name}={f.value}" for f in fields)
+            raise RuntimeError(f"Error fetching {self.model_class.__name__} by fields [{field_details}]: {e}") from e
+        finally:
+            session.close()
+
+    def get_by_id(self, id_: Union[int, str, tuple, dict]):
+        pk_names = self._id_name()
+
+        if isinstance(id_, dict):
+            fields = [Field(name=k, value=v) for k, v in id_.items()]
+        elif isinstance(id_, tuple):
+            if len(pk_names) != len(id_):
+                raise ValueError(f"Expected {len(pk_names)} values for composite key, got {len(id_)}")
+            fields = [Field(name=pk_names[i], value=id_[i]) for i in range(len(pk_names))]
+        else:
+            fields = [Field(name=pk_names[0], value=id_)]
+
+        return self.get_by_fields(fields)
 
     def update(self, item):
         session = self._create_a_session()
         try:
             session.merge(item)
             session.commit()
-        except Exception:
+            return item
+        except Exception as e:
             session.rollback()
-            raise
+            raise RuntimeError(f"Error updating {self.model_class.__name__}: {e}") from e
         finally:
             session.close()
-        return item
 
-    def _create_a_session(self):
+    def _create_a_session(self) -> Session:
         if self.db is None:
             raise ValueError("Database not initialized")
         session = self.db.get_session()
         if session is None:
-            raise ValueError(
-                "An error occurred while connecting to the database")
+            raise ValueError("An error occurred while connecting to the database")
         return session
