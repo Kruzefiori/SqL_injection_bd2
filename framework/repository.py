@@ -80,7 +80,7 @@ class GenericRepository:
         try:
             query = session.query(self.model_class)
             for field in fields:
-                column = getattr(self.model_class, field.name, None)
+                column = getattr(self.model_class, field.name[0], None)
                 if column is None:
                     raise AttributeError(
                         f"Model {self.model_class.__name__} has no field named '{field.name}'"
@@ -136,6 +136,13 @@ class GenericRepository:
             raise ValueError("An error occurred while connecting to the database")
         return session
 
+###===========================================================================================
+###===========================================================================================
+###===========================================================================================
+### PSYCOPG
+###===========================================================================================
+###===========================================================================================
+###===========================================================================================
 
 class GenericRepositoryInjection:
     # Write this class the same as the class above but providing a framework to perform queries
@@ -146,10 +153,17 @@ class GenericRepositoryInjection:
         if self.db is None:
             raise ValueError("Database not initialized")
         self.model_class = model_class
-        self.cursor = self.db.get_cursor()
         self.connection = self.db.get_connection()
+        self.cursor = self.db.get_cursor()
+        
+
+    def refresh_cursor (self):
+        if self.cursor is None or self.connection is None:
+            self.db.get_connection()
+            self.db.get_cursor()
 
     def create(self, item):
+        self.refresh_cursor()
         try:
             columns = ", ".join(item.keys())
             values = ", ".join([f"%({key})s" for key in item.keys()])
@@ -163,6 +177,7 @@ class GenericRepositoryInjection:
             ) from e
 
     def delete(self, item):
+        self.refresh_cursor()
         try:
             query = f"DELETE FROM {self.model_class.__tablename__} WHERE id = %s"
             self.cursor.execute(query, (item.id,))
@@ -183,11 +198,16 @@ class GenericRepositoryInjection:
         return [key.name for key in inspect(self.model_class).primary_key]
 
     def get_all(self, page: int = 1, page_size: int = 10):
+        self.refresh_cursor()
         offset = (page - 1) * page_size
         try:
             query = f"SELECT * FROM {self.model_class.__tablename__} LIMIT %s OFFSET %s"
             self.cursor.execute(query, (page_size, offset))
-            return self.cursor.fetchall()
+            results = self.cursor.fetchall()
+            if results:
+                column_names = [desc[0] for desc in self.cursor.description]
+                return [dict(zip(column_names, row)) for row in results]
+            return []
         except Exception as e:
             raise RuntimeError(
                 f"Error fetching all {self.model_class.__name__}: {e}"
@@ -197,11 +217,22 @@ class GenericRepositoryInjection:
         return self.get_by_fields([field])
 
     def get_by_fields(self, fields: list[Field]):
+        self.refresh_cursor()
         try:
-            query = f"SELECT * FROM {self.model_class.__tablename__} WHERE "
-            query += " AND ".join([f"{field.name} = {field.value}" for field in fields])
-            self.cursor.execute(query)
-            return self.cursor.fetchone()
+            # Construção da query Where com os placeholders de values (%s)
+            where_clause = " AND ".join([f"{field.name[0]} = %s" for field in fields])
+            query = f"SELECT * FROM {self.model_class.__tablename__} WHERE {where_clause}"
+            
+            # Extrair o valor do campo para ser substituído no placeholder
+            values = [field.value for field in fields]
+            
+            self.cursor.execute(query, values)
+            result = self.cursor.fetchone()
+            if result:
+                # Mapeia os resultados para um dicionário
+                column_names = [desc[0] for desc in self.cursor.description]
+                return dict(zip(column_names, result))
+            return None
         except Exception as e:
             field_details = ", ".join(f"{f.name}={f.value}" for f in fields)
             raise RuntimeError(
@@ -227,6 +258,7 @@ class GenericRepositoryInjection:
         return self.get_by_fields(fields)
 
     def update(self, item):
+        self.refresh_cursor()
         try:
             columns = ", ".join([f"{key} = %s" for key in item.keys()])
             query = f"UPDATE {self.model_class.__tablename__} SET {columns} WHERE id = %s RETURNING *"
