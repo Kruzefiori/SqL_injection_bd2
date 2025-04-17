@@ -21,7 +21,7 @@ class GenericService:
 
     def get_by_id(self, id: int):
         item = self.model_repository.get_by_field(
-            Field(name=self.model_repository.id_name(), value=id)
+            Field(name=self.model_repository._id_name(), value=id)
         )
         if item is None:
             raise ValueError("Item not found")
