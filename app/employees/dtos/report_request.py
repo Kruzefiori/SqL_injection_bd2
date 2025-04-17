@@ -22,3 +22,17 @@ class ReportRequest(BaseModel):
             "end_date": self.end_date,
             "page": self.page,
         }
+
+class ReportRequestInjection(BaseModel):
+    start_date: str = Field(
+        ..., description="Data inicial do relatório (inclusiva)"
+    )
+    end_date: str = Field(..., description="Data final do relatório (inclusiva)")
+    page: int = Field(1, gt=0, description="Número da página (a partir de 1)")
+
+    def to_service_params(self) -> Dict[str, Any]:
+        return {
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "page": self.page,
+        }

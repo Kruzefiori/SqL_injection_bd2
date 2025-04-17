@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from app.employees.controllers.no_injection import employees_controller
 from app.employees.controllers.injection import employees_injection_controller
 from app.employees.views.no_injection import employees_view
+from app.employees.views.injection import employees_injection_view
 from app.orders.controllers.no_injection import order_controller
 from app.orders.controllers.injection import order_injection_controller
 from app.orders.views.no_injection import order_view
@@ -20,6 +21,9 @@ app.add_middleware(
 
 app.include_router(employees_controller, prefix="/v1/no_injection", tags=["Employees"])
 app.include_router(employees_view, tags=["Employees"])
+app.include_router(
+    employees_injection_view, prefix="/injection", tags=["Employees"]
+)
 app.include_router(
     employees_injection_controller, prefix="/v1/injection", tags=["Employees"]
 )

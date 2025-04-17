@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Escolher Período</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100">
+    <div class="max-w-xl mx-auto mt-12 p-6 bg-white rounded-lg shadow-md">
+      <h1 class="text-2xl font-bold mb-4 text-center text-gray-800">
+        Relatório de Salários por Período
+      </h1>
+
+      <form action="/injection/employees/report" method="get" class="space-y-4">
+        <div>
+          <label for="start_date" class="block font-medium text-gray-700"
+            >Data Inicial</label
+          >
+          <input
+            type="text"
+            name="start_date"
+            id="start_date"
+            required
+            class="w-full mt-1 border border-gray-300 rounded px-3 py-2"
+          />
+        </div>
+
+        <div>
+          <label for="end_date" class="block font-medium text-gray-700"
+            >Data Final</label
+          >
+          <input
+            type="text"
+            name="end_date"
+            id="end_date"
+            required
+            class="w-full mt-1 border border-gray-300 rounded px-3 py-2"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700"
+        >
+          Ver Relatório
+        </button>
+      </form>
+    </div>
+  </body>
+</html>

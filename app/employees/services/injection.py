@@ -9,16 +9,16 @@ class EmployeesServiceInjection(GenericService):
         super().__init__(EmployeesRepositoryInjection)
 
     def get_employee_report(
-        self, start_date: datetime, end_date: datetime, page: int = 1
+        self, start_date: str, end_date: str, page: int = 1
     ):
         raw_data = self.model_repository.get_employee_report(start_date, end_date, page)
 
         serialized_data = [
             {
-                "first_name": row[0],
-                "last_name": row[1],
-                "employee_id": row[2],
-                "total_sales": float(row[3]) if isinstance(row[3], Decimal) else row[3],
+                "first_name": row['firstname'],
+                "last_name": row['lastname'],
+                "employee_id": row['employeeid'],
+                "total_sales": row['soma_valores_vendidos'],
             }
             for row in raw_data
         ]

@@ -4,7 +4,7 @@ from ..model import Employees
 from ..services.injection import EmployeesServiceInjection
 from fastapi import status
 from fastapi.encoders import jsonable_encoder
-from ..dtos.report_request import ReportRequest
+from ..dtos.report_request import ReportRequestInjection
 from ..dtos.report_response import ReportResponse
 
 employees_service = EmployeesServiceInjection()
@@ -27,13 +27,19 @@ employees_injection_controller = create_generic_router(
         500: {"description": "Erro interno do servidor"},
     },
 )
-async def generate_report(request_data: ReportRequest) -> JSONResponse:
+async def generate_report(request_data: ReportRequestInjection) -> JSONResponse:
     try:
         service_params = request_data.to_service_params()
 
+        print('====================')
+        print(service_params)
+        print('====================')
+
         report_data = employees_service.get_employee_report(**service_params)
 
+        print('====================')
         print(report_data)
+        print('====================')
 
         response = ReportResponse.from_service_data(report_data)
 
