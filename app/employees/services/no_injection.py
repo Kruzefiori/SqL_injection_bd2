@@ -17,8 +17,11 @@ class EmployeesService(GenericService):
             {
                 "first_name": row[0],
                 "last_name": row[1],
-                "employee_id": row[2],
-                "total_sales": float(row[3]) if isinstance(row[3], Decimal) else row[3],
+                "employee_id": row[4],
+                "sales": {
+                    "total": float(row[3]) if isinstance(row[3], Decimal) else row[3],
+                    "count": row[2]
+                },
             }
             for row in raw_data
         ]

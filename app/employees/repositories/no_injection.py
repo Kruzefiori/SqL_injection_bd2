@@ -29,6 +29,7 @@ class EmployeesRepository(GenericRepository):
                     func.sum(OrderDetails.unitprice * OrderDetails.quantity).label(
                         "soma_valores_vendidos"
                     ),
+                    Employees.employeeid
                 )
                 .join(Orders, Orders.employeeid == Employees.employeeid)
                 .join(OrderDetails, OrderDetails.orderid == Orders.orderid)
@@ -41,6 +42,8 @@ class EmployeesRepository(GenericRepository):
                 .limit(page_size)
                 .all()
             )
+
+            print(results)
 
             return results
 

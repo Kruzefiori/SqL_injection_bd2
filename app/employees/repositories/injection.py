@@ -1,6 +1,5 @@
 from ..model import Employees
 from framework.repository import GenericRepositoryInjection
-from datetime import datetime
 
 
 class EmployeesRepositoryInjection(GenericRepositoryInjection):
@@ -27,7 +26,7 @@ class EmployeesRepositoryInjection(GenericRepositoryInjection):
                 "page_size": page_size,
             }
 
-            query = '''
+            query = """
                 SELECT e.firstname, e.lastname, e.employeeid, COUNT(o.orderid) AS total_pedidos,
                        SUM(od.unitprice * od.quantity) AS soma_valores_vendidos
                 FROM employees e
@@ -37,7 +36,7 @@ class EmployeesRepositoryInjection(GenericRepositoryInjection):
                 GROUP BY e.employeeid
                 ORDER BY soma_valores_vendidos DESC
                 OFFSET {offset} LIMIT {page_size};
-            '''.format(**args)
+            """.format(**args)
 
             # print(query)
 
@@ -48,7 +47,7 @@ class EmployeesRepositoryInjection(GenericRepositoryInjection):
                 return [dict(zip(column_names, row)) for row in results]
             else:
                 print("Nenhum resultado encontrado.")
-            
+
             return []
 
         except Exception as e:

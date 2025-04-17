@@ -24,6 +24,9 @@
                         <th class="px-4 py-2 text-left text-gray-700">
                             Total de Vendas
                         </th>
+                        <th class="px-4 py-2 text-left text-gray-700">
+                            Nº de Vendas
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -36,7 +39,10 @@
                             {{ emp.first_name }} {{ emp.last_name }}
                         </td>
                         <td class="px-4 py-2 text-gray-800">
-                            R$ {{ '{:,.2f}'.format(emp.total_sales) }}
+                            R$ {{ '{:,.2f}'.format(emp.sales.total) }}
+                        </td>
+                        <td class="px-4 py-2 text-gray-800">
+                            {{ emp.sales.count }}
                         </td>
                     </tr>
                     {% endfor %}

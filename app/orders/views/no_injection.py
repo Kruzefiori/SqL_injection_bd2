@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Form
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from app.orders.services.no_injection import OrderService
+import re
 
 order_view = APIRouter()
 templates = Jinja2Templates(directory="app/orders/templates/")
@@ -51,3 +52,46 @@ async def show_orders(
     except Exception as e:
         print(f"Error generating order report for product_id {product_id}: {str(e)}")
         raise
+
+@order_view.get("/orders", response_class=HTMLResponse)
+async def show_order_form(request: Request):
+    return templates.TemplateResponse("insert.html", {"request": request})
+
+
+@order_view.post("/orders")
+async def save_order(
+    request: Request,
+    cliente_nome: str = Form(...),
+    vendedor_nome: str = Form(...),
+    pedido_numero: str = Form(...),
+    pedido_data: str = Form(...),
+):
+    form = await request.form()
+    raw_itens = []
+
+    index = 0
+    for key, value in form.items():
+        print(f"key: {key}, value: {value}")
+        if key.startswith("itens["):
+            print("startwiths")
+            match = re.match(r"itens\[\$\{itemIndex\}\]\[(.*?)\]", key)
+            if match:
+                print(f"match: {match.group(1)}")
+                field = match.group(1).lower()
+                if field == "nome":
+                    raw_itens.append({})
+                    raw_itens[index]["nome"] = value.strip()
+                elif field == "quantidade":
+                    raw_itens[index]["quantidade"] = int(value)
+                elif field == "preco":
+                    raw_itens[index]["preco"] = float(value)
+                    index += 1
+
+    print("Cliente:", cliente_nome)
+    print("Vendedor:", vendedor_nome)
+    print("Número do pedido:", pedido_numero)
+    print("Data:", pedido_data)
+    print("Itens:", raw_itens)
+
+    # return RedirectResponse(url="v1/orders/new", status_code=303)
+    return None

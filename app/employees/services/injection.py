@@ -1,7 +1,5 @@
 from framework.service import GenericService
 from ..repositories.injection import EmployeesRepositoryInjection
-from datetime import datetime
-from decimal import Decimal
 
 
 class EmployeesServiceInjection(GenericService):
@@ -18,7 +16,10 @@ class EmployeesServiceInjection(GenericService):
                 "first_name": row['firstname'],
                 "last_name": row['lastname'],
                 "employee_id": row['employeeid'],
-                "total_sales": row['soma_valores_vendidos'],
+                "sales": {
+                    "total": row['soma_valores_vendidos'],
+                    "count": row['total_pedidos']
+                },
             }
             for row in raw_data
         ]
