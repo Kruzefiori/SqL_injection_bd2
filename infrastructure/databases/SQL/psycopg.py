@@ -16,6 +16,7 @@ class PsycopgSqlDB:
         try:
             self.connection = psycopg.connect(dsn=env.sql_db_uri)
             self.cursor = self.connection.cursor()
+            self.cursor.execute("SET search_path TO northwind;")
         except OperationalError as e:
             print(f"Error connecting to the database: {e}")
             raise
