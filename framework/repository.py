@@ -266,7 +266,12 @@ class GenericRepositoryInjection:
             values.append(item.id)
             self.cursor.execute(query, values)
             self.connection.commit()
-            return self.cursor.fetchone()
+            result = self.cursor.fetchone()
+            if result:
+                # Mapeia os resultados para um dicionário
+                column_names = [desc[0] for desc in self.cursor.description]
+                return dict(zip(column_names, result))
+            return None
         except Exception as e:
             raise RuntimeError(
                 f"Error updating {self.model_class.__name__}: {e}"
@@ -275,6 +280,7 @@ class GenericRepositoryInjection:
     def _create_a_session(self):
         if self.db is None:
             raise ValueError("Database not initialized")
+        self.refresh_cursor()
         session = self.db.get_cursor()
         if session is None:
             raise ValueError("An error occurred while connecting to the database")
