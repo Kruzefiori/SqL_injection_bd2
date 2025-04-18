@@ -1,6 +1,7 @@
 from ..models.order import Orders
 from framework.repository import GenericRepositoryInjection
-
+import math
+import random
 
 class OrdersRepositoryInjection(GenericRepositoryInjection):
     def __init__(self):
@@ -35,3 +36,58 @@ class OrdersRepositoryInjection(GenericRepositoryInjection):
             raise RuntimeError(
                 f"Erro ao buscar informações do pedido {order_id}: {e}"
             ) from e
+    
+    def create(self, item):
+        self.refresh_cursor()
+
+        cliente_nome = item["cliente_nome"]
+        vendedor_nome = item["vendedor_nome"]
+        pedido_data = item["pedido_data"]
+        itens = item["itens"]
+
+        try:
+            cliente_query = f"SELECT customerid FROM customers WHERE contactname = '{cliente_nome}'"
+            self.cursor.execute(cliente_query)
+            cliente = self.cursor.fetchone()
+            if not cliente:
+                raise ValueError(f"Cliente '{cliente_nome}' não encontrado.")
+            customerid = cliente[0]
+
+            vendedor_query = f"SELECT employeeid FROM employees WHERE firstname = '{vendedor_nome}'"
+            self.cursor.execute(vendedor_query)
+            vendedor = self.cursor.fetchone()
+            if not vendedor:
+                raise ValueError(f"Vendedor '{vendedor_nome}' não encontrado.")
+            employeeid = vendedor[0]
+
+            orderid = 420 + int(random.random() * 1000)
+            pedido_query = f"""
+                INSERT INTO orders (orderid, customerid, employeeid, orderdate)
+                VALUES ({orderid}, '{customerid}', '{employeeid}', '{pedido_data}')
+            """
+            self.cursor.execute(pedido_query)
+
+            # Inserir detalhes dos pedidos
+            for item_detalhe in itens:
+                produto_query = f"SELECT productid FROM products WHERE productname = '{item_detalhe['nome']}'"
+                self.cursor.execute(produto_query)
+                produto = self.cursor.fetchone()
+                if not produto:
+                    raise ValueError(f"Produto '{item_detalhe['nome']}' não encontrado.")
+                productid = produto[0]
+
+                detalhe_query = f"""
+                    INSERT INTO order_details (orderid, productid, unitprice, quantity, discount)
+                    VALUES ({orderid}, '{productid}', {item_detalhe['preco']}, {item_detalhe['quantidade']}, 0)
+                """
+                print(detalhe_query)
+                self.cursor.execute(detalhe_query)
+
+            print(f"Pedido {orderid} criado com sucesso.")
+            # Faz o commit
+            self.connection.commit()
+            return orderid
+
+        except Exception as e:
+            self.connection.rollback()
+            raise RuntimeError(f"Erro ao criar o pedido: {e}") from e

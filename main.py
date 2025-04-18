@@ -8,6 +8,7 @@ from app.employees.views.injection import employees_injection_view
 from app.orders.controllers.no_injection import order_controller
 from app.orders.controllers.injection import order_injection_controller
 from app.orders.views.no_injection import order_view
+from app.orders.views.injection import order_view_injection
 
 app = FastAPI()
 
@@ -30,3 +31,4 @@ app.include_router(
 app.include_router(order_controller, prefix="/v1/no_injection", tags=["Orders"])
 app.include_router(order_injection_controller, prefix="/v1/injection", tags=["Orders"])
 app.include_router(order_view, tags=["Orders"])
+app.include_router(order_view_injection, prefix="/injection", tags=["Orders"])

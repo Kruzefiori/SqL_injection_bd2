@@ -7,7 +7,6 @@ from sqlalchemy.orm import Session
 
 T = TypeVar("T")
 
-
 @dataclass
 class Field(Generic[T]):
     name: str
@@ -21,6 +20,7 @@ class GenericRepository:
             raise ValueError("Database not initialized")
         self.model_class = model_class
 
+    """
     def create(self, item):
         session = self._create_a_session()
         try:
@@ -35,6 +35,7 @@ class GenericRepository:
             ) from e
         finally:
             session.close()
+    """
 
     def delete(self, item):
         session = self._create_a_session()
@@ -162,6 +163,7 @@ class GenericRepositoryInjection:
             self.db.get_connection()
             self.db.get_cursor()
 
+    """
     def create(self, item):
         self.refresh_cursor()
         try:
@@ -175,6 +177,7 @@ class GenericRepositoryInjection:
             raise RuntimeError(
                 f"Error creating {self.model_class.__name__}: {e}"
             ) from e
+    """
 
     def delete(self, item):
         self.refresh_cursor()

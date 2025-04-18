@@ -2,7 +2,7 @@ from ..models.order import Orders
 from ..models.order_details import OrderDetails
 from framework.repository import GenericRepository
 from sqlalchemy.orm import joinedload
-from typing import override
+# from typing import override
 from sqlalchemy.future import select
 from datetime import datetime
 from decimal import Decimal
@@ -62,7 +62,6 @@ class OrderRepository(GenericRepository):
         finally:
             session.close()
 
-    @override
     def create(self, item):
         session = self._create_a_session()
 
