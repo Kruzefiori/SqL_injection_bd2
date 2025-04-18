@@ -71,12 +71,9 @@ async def save_order(
 
     index = 0
     for key, value in form.items():
-        print(f"key: {key}, value: {value}")
         if key.startswith("itens["):
-            print("startwiths")
             match = re.match(r"itens\[\$\{itemIndex\}\]\[(.*?)\]", key)
             if match:
-                print(f"match: {match.group(1)}")
                 field = match.group(1).lower()
                 if field == "nome":
                     raw_itens.append({})
@@ -87,11 +84,13 @@ async def save_order(
                     raw_itens[index]["preco"] = float(value)
                     index += 1
 
-    print("Cliente:", cliente_nome)
-    print("Vendedor:", vendedor_nome)
-    print("Número do pedido:", pedido_numero)
-    print("Data:", pedido_data)
-    print("Itens:", raw_itens)
-
-    # return RedirectResponse(url="v1/orders/new", status_code=303)
-    return None
+    order_service.create(
+        {
+            "cliente_nome": cliente_nome,
+            "vendedor_nome": vendedor_nome,
+            "pedido_numero": pedido_numero,
+            "pedido_data": pedido_data,
+            "itens": raw_itens,
+        }
+    )
+    return RedirectResponse(url="/orders", status_code=303)
